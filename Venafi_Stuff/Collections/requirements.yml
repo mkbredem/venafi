@@ -1,2 +1,5 @@
-Collections:
-  - name: venafi.machine_identity
+---
+collections:
+  - name: venafi.machine_identity        # Venafi VaaS/TPP integration
+  - name: redhat.rhel_system_roles       # For SELinux context handling around cert dirs
+  - name: community.crypto               # For x509_certificate_info (inspect certs)
