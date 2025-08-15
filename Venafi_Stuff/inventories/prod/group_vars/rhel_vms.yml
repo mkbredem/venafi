@@ -1,0 +1,27 @@
+# List one or more certs to evaluate per host.
+# You can override per host in host_vars if paths differ.
+cert_targets:
+  - cert_path: /etc/pki/tls/certs/host.crt
+    key_path:  /etc/pki/tls/private/host.key
+    # optional: which service to restart after replacement
+    service:   "nginx"          # set to null if none
+
+# “Soon to expire” window (inclusive)
+soon_min_days: 5
+soon_max_days: 15
+
+# Day threshold to actually replace (exact match)
+replace_on_days_left: 3
+
+# Where the new certs come from (demo: drop-in from Controller project)
+# In real life, swap this for Venafi/ACME/etc. in the renew_cert role.
+renewal_source_dir: "files/new_certs"   # path inside the project (Controller)
+
+# File ownership & perms after replace
+cert_owner: root
+cert_group: root
+cert_mode: "0644"
+key_mode:  "0600"
+
+# Where to write the CSV report on the controller (runner) filesystem
+report_out_path: "/tmp/cert_renew_report_{{ ansible_date_time.date }}.csv"

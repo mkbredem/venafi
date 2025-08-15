@@ -1,0 +1,154 @@
+---
+- name: Cert health check + conditional renewal + reporting
+  hosts: rhel_vms
+  gather_facts: false
+  vars:
+    now_iso: "{{ lookup('pipe','date -u +%Y-%m-%dT%H:%M:%SZ') }}"
+    now_dt: "{{ now_iso | to_datetime('%Y-%m-%dT%H:%M:%SZ') }}"
+  pre_tasks:
+    - name: Ensure community.crypto is available
+      assert:
+        that: "'community.crypto' in ansible_collections"
+        fail_msg: "community.crypto collection not available in this EE. Install it or bake it into the EE."
+        success_msg: "community.crypto present"
+
+  tasks:
+    - name: Read certificate metadata
+      community.crypto.x509_certificate_info:
+        path: "{{ item.cert_path }}"
+      loop: "{{ cert_targets }}"
+      register: cert_info_list
+      failed_when: false  # don't hard-fail a host if a cert is missing
+      changed_when: false
+
+    - name: Build per-cert evaluation (days_left, soon flag)
+      vars:
+        not_after: "{{ cert_item.item.cert_path }}:{{ cert_item.not_after if cert_item.not_after is defined else '' }}"
+        # cert_item.not_after is RFC2822-ish; parse robustly:
+        expiry_dt: "{{ (cert_item.not_after | default('1970-01-01T00:00:00Z')) | to_datetime }}"
+        days_left: "{{ ((expiry_dt - now_dt).total_seconds() / 86400) | round(0, 'floor') | int }}"
+        soon: "{{ (days_left >= soon_min_days) and (days_left <= soon_max_days) }}"
+        due_replace_today: "{{ days_left == replace_on_days_left }}"
+      set_fact:
+        cert_evaluations: "{{ (cert_evaluations | default([])) + [ {
+            'cert_path': cert_item.item.cert_path,
+            'key_path':  cert_item.item.key_path | default(''),
+            'service':   cert_item.item.service | default(omit),
+            'not_after': cert_item.not_after | default('UNKNOWN'),
+            'fingerprint_before': cert_item.fingerprint_sha256 | default('UNKNOWN'),
+            'days_left': days_left,
+            'soon': soon,
+            'due_replace_today': due_replace_today
+        } ] }}"
+      loop: "{{ cert_info_list.results }}"
+      loop_control:
+        loop_var: cert_item
+
+    - name: Conditionally renew certificates when exactly N days remain
+      when: cert_evaluations | selectattr('due_replace_today','equalto',true) | list | length > 0
+      block:
+        - name: Renew per targeted cert
+          include_role:
+            name: renew_cert
+          loop: "{{ cert_evaluations | selectattr('due_replace_today','equalto',true) | list }}"
+          loop_control:
+            loop_var: renew_item
+
+        - name: Re-read metadata after renewal (only for the ones we touched)
+          community.crypto.x509_certificate_info:
+            path: "{{ item.cert_path }}"
+          loop: "{{ cert_evaluations | selectattr('due_replace_today','equalto',true) | list }}"
+          register: cert_info_after
+          changed_when: false
+
+        - name: Merge after-state into evaluation
+          vars:
+            after_map: >-
+              {{
+                dict(cert_info_after.results | map('extract', attribute='item.cert_path') |
+                zip(cert_info_after.results | map(attribute='fingerprint_sha256')))
+              }}
+          set_fact:
+            cert_evaluations: >-
+              {{
+                cert_evaluations | map('combine',
+                  itemgetter('cert_path') | list | first is not defined
+                )
+              }}
+          # Above combine is messy in Jinja; simpler approach next task:
+      rescue:
+        - debug:
+            msg: "Renewal block failed on {{ inventory_hostname }}. See task output."
+      always:
+        - name: Post-process after-state cleanly
+          vars:
+            after_map: >-
+              {{
+                dict(
+                  (cert_info_after.results | default([])) |
+                  map('extract', attribute='item.cert_path') |
+                  zip((cert_info_after.results | default([])) | map(attribute='fingerprint_sha256'))
+                )
+              }}
+          set_fact:
+            cert_evaluations: >-
+              {{
+                cert_evaluations | map('combine',
+                  [{'fingerprint_after':
+                       (after_map[item.cert_path] if item.cert_path in after_map else item.fingerprint_after|default(''))}]
+                ) | list
+              }}
+
+    - name: Mark actions for report
+      set_fact:
+        cert_report_rows: >-
+          {{
+            (cert_report_rows | default([]))
+            +
+            (cert_evaluations | map('combine',
+              [{'host': inventory_hostname},
+               {'action':
+                  ( 'replaced'
+                    if item.due_replace_today
+                    else ( 'soon'
+                           if item.soon
+                           else 'none'
+                    )
+                  )
+               }
+              ])
+            | list)
+          }}
+
+    - name: Contribute to aggregated report across all hosts
+      set_stats:
+        data:
+          cert_report_rows: "{{ cert_report_rows }}"
+        aggregate: true
+
+- name: Render and publish consolidated CSV report
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Pull in aggregated rows; default empty if no hosts reported
+    all_rows: "{{ hostvars['localhost'].cert_report_rows | default([]) }}"
+  tasks:
+    - name: Fail clearly if we have no data (optional)
+      when: all_rows | length == 0
+      fail:
+        msg: "No certificate data collected. Check inventory or collection setup."
+
+    - name: Sort rows for readability
+      set_fact:
+        all_rows_sorted: "{{ all_rows | sort(attribute='host') }}"
+
+    - name: Write CSV report to controller filesystem
+      copy:
+        dest: "{{ report_out_path }}"
+        content: "{{ lookup('template', 'templates/cert_report.csv.j2') }}"
+        mode: '0644'
+
+    - name: Attach path as job artifact metadata
+      set_stats:
+        data:
+          cert_report_path: "{{ report_out_path }}"

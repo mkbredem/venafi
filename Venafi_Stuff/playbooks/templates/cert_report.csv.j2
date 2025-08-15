@@ -1,0 +1,4 @@
+host,cert_path,days_left,action,not_after,fingerprint_before,fingerprint_after
+{% for r in all_rows_sorted -%}
+{{ r.host }},{{ r.cert_path }},{{ r.days_left }},{{ r.action }},{{ r.not_after | replace(',', ' ') }},{{ r.fingerprint_before }},{{ r.fingerprint_after | default('') }}
+{% endfor -%}

@@ -1,0 +1,38 @@
+---
+- name: Ensure backup dir exists
+  file:
+    path: /var/backups/certs
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Backup current cert if present
+  copy:
+    src: "{{ renew_item.cert_path }}"
+    dest: "/var/backups/certs/{{ (renew_item.cert_path | basename) }}.{{ ansible_date_time.iso8601_basic_short }}"
+    remote_src: true
+  ignore_errors: true
+
+- name: Deploy new certificate
+  copy:
+    src: "{{ renewal_source_dir }}/{{ inventory_hostname }}/{{ renew_item.cert_path | basename }}"
+    dest: "{{ renew_item.cert_path }}"
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_group }}"
+    mode: "{{ cert_mode }}"
+
+- name: Deploy new private key (if path provided)
+  when: renew_item.key_path | default('') | length > 0
+  copy:
+    src: "{{ renewal_source_dir }}/{{ inventory_hostname }}/{{ renew_item.key_path | basename }}"
+    dest: "{{ renew_item.key_path }}"
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_group }}"
+    mode: "{{ key_mode }}"
+
+- name: Restart service if defined
+  when: renew_item.service is defined and renew_item.service|length > 0
+  service:
+    name: "{{ renew_item.service }}"
+    state: restarted
