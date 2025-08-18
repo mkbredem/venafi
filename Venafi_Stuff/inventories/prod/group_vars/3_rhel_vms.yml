@@ -1,0 +1,43 @@
+# Certs to inspect/maintain per host (override in host_vars if paths differ)
+cert_targets:
+  - cert_path: /etc/pki/tls/certs/host.crt
+    key_path:  /etc/pki/tls/private/host.key
+    service:   "nginx"     # set to null if not applicable
+    cn:        "{{ inventory_hostname }}"   # Venafi common name (adjust as needed)
+    zone:      "Default\\MyApp"             # Venafi zone (VaaS/TPP); escape backslash for TPP
+
+# Windows for notification / action
+soon_min_days: 5
+soon_max_days: 15
+replace_on_days_left: 3
+
+# Where to place the consolidated CSV (on controller/runner)
+report_out_path: "/tmp/cert_renew_report_{{ ansible_date_time.date }}.csv"
+
+# SELinux: ensure cert files live under cert_t contexts
+selinux_label_cert: "cert_t"
+
+# -------- Venafi connection (examples) --------
+# For Venafi as a Service (VaaS):
+venafi_connection:
+  platform: "vaas"
+  api_key: "{{ lookup('env','VENAFI_VAAS_API_KEY') }}"
+  url: "https://api.venafi.cloud/v1"  # default; change if needed
+
+# For Venafi TPP instead, use:
+# venafi_connection:
+#   platform: "tpp"
+#   url: "https://tpp.example.com"
+#   username: "{{ vault_tpp_user }}"
+#   password: "{{ vault_tpp_pass }}"
+#   trust_bundle: "/etc/pki/ca-trust/source/anchors/tpp-ca.pem"
+
+# Key/cert format preferences for issuance
+cert_profile:
+  key_type: "RSA"
+  key_size: 2048
+  chain_option: "root-first"     # typical Venafi option; adjust to your standard
+  file_perm_cert: "0644"
+  file_perm_key: "0600"
+  owner: root
+  group: root
