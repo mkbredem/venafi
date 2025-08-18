@@ -5,7 +5,7 @@
     - cloud
   tasks:
   - name: venafi_certificate
-    venafi_certificate:
+    venafi.machine_identity.venafi_certificate:
       token: "{{ venafi_api_key | default(lookup('env','VENAFI_APIKEY'), true) }}"
       zone: 'Default'
       cert_path: '/tmp'
