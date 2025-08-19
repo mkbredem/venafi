@@ -1,0 +1,43 @@
+- name: venafi_certificate_cloud
+  connection: local
+  hosts: localhost
+  vars:
+  # injected via custom credential or set in extra_vars at run time
+  venafi_api_key: "{{ venafi_api_key | default(lookup('env','VENAFI_APIKEY'), true) }}"
+  venafi_zone:    "{{ venafi_zone    | default('MyApp\\Default') }}"
+  # certificate request parameters
+  common_name: "webserver.mbredeme.com"
+  dns_sans:
+    - "webserver.mbredeme.com"
+  key_type: "rsa"
+  key_length: 2048
+  cert_dest_path: "/etc/pki/tls/certs/www.example.com.crt"
+  key_dest_path:  "/etc/pki/tls/private/www.example.com.key"
+  chain_dest_path: "/etc/pki/tls/certs/www.example.com.chain.crt"
+  restart_handler: "restart httpd"
+  tags:
+    - cloud
+  # this is the playbook to test the venafi_certificate module
+  # it will request a certificate from Venafi Cloud and save it to the specified paths
+  # it will also restart nginx if the certificate is successfully retrieved
+  # ensure you have the necessary permissions and configurations set up in Venafi Cloud
+  # to run this playbook successfully
+
+  tasks:
+    - name: Enroll certificate
+      venafi.machine_identity.venafi_certificate:
+        token: "{{ venafi_api_key }}"
+        zone: "AAP25DemoCrt\\AAP25DemoCert"
+        common_name: "webserver.mbredeme.com"
+        cert_path: '/tmp'
+        dns_names:
+          - "webserver.mbredeme.com"
+        #csr_origin: service
+        #key_format: pem
+        #key_path: "/etc/pki/tls/private/webserver.key"
+        #cert_path: "/etc/pki/tls/certs/webserver.crt"
+        #chain_path: "/etc/pki/tls/certs/webserver-chain.crt"
+
+    - name: dump test output
+      debug:
+        msg: '{{ certout }}'
