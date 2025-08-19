@@ -37,13 +37,11 @@
   tasks:
     - name: Get Venafi Outage Detection Applications
       ansible.builtin.uri:
-        url: >-
-          https://api.venafi.cloud/outagedetection/v1/applications
-          ?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false
+        url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
         method: GET
         headers:
-          Accept: "application/json"
-          tppl-api-key: "{{ vaas_api_key }}"
+          accept: "application/json"
+          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
         return_content: true
         status_code: 200
       register: od_apps
