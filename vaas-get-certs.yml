@@ -64,7 +64,7 @@
       ansible.builtin.debug:
         msg:
           - "Applications HTTP {{ vaas_apps.status }}"
-          - "Applications count (best-effort): {{ (vaas_apps.json | default({})).items | default(vaas_apps.json | default([])) | length }}"
+          - "Applications count: {{ apps_list | length }}"
 
     # --- Certificates (Outage Detection API) ---
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
