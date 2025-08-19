@@ -5,7 +5,7 @@
     - fake
   tasks:
   - name: venafi_certificate
-    venafi_certificate:
+    venafi.machine_identity.venafi_certificate:
       #token: "{{ venafi_api_key }}"
       test_mode: true
       common_name: 'testcert-fake-{{ 99999999 | random }}.example.com'
