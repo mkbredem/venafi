@@ -37,7 +37,7 @@
   tasks:
     - name: Get Applications (tenant-scoped)
       ansible.builtin.uri:
-        url: "{{ tenant_base_url }}/applications"
+        url: "{{ tenant_base_url }}/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false' \"
         method: GET
         headers:
           Accept: "application/json"
