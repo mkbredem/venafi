@@ -8,6 +8,7 @@
     # === Required ===
     vaas_api_key: "{{ venafi_api_key }}"   # or inject via AAP credential as a variable
     tenant_base_url: "https://eval-85300634.venafi.cloud" # your tenant base
+    global_api_url:  "https://api.venafi.cloud"
     # Many APIs are also available under api.venafi.cloud; most tenants proxy on their base URL too.
 
     # === Tuning ===
@@ -70,7 +71,7 @@
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
     - name: Get Certificates (up to {{ cert_limit }})
       ansible.builtin.uri:
-        url: "{{ tenant_base_url }}/outagedetection/v1/certificates?{{ cert_params }}&limit={{ cert_limit }}"
+        url: "{{ global_api_url }}/outagedetection/v1/certificates?{{ cert_params }}&limit={{ cert_limit }}"
         method: GET
         headers:
           Accept: "application/json"
