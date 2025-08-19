@@ -71,7 +71,7 @@
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
     - name: Get Certificates (up to {{ cert_limit }})
       ansible.builtin.uri:
-        url: "{{ global_api_url }}/outagedetection/v1/certificates?{{ cert_params }}&limit={{ cert_limit }}"
+        url: "{{ tenant_base_url }}/outagedetection/v1/certificates?{{ cert_params }}&limit={{ cert_limit }}"
         method: GET
         headers:
           Accept: "application/json"
