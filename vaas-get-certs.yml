@@ -45,34 +45,10 @@
         return_content: true
         status_code: 200
       register: vaas_apps
-#    - name: Get Applications (tenant-scoped)
-#      ansible.builtin.uri:
-#        url: "{{ tenant_base_url }}/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false'"
-#        method: GET
-#        headers:
-#          Accept: "application/json"
-#          Authorization: "Bearer {{ vaas_api_key }}"
-#        return_content: true
-#        status_code: [200]
-#      register: vaas_apps
 
     - name: Parse JSON (prefer .json, fall back to .content)
       ansible.builtin.set_fact:
         vaas_parsed: "{{ vaas_apps.json | default(vaas_apps.content | from_json) }}"
-    
-    # Sanity check the count
-    - name: Count applications
-      ansible.builtin.debug:
-        msg:
-          - "totalCount field: {{ vaas_parsed.totalCount | default('missing') }}"
-          - "applications array length: {{ (vaas_parsed.applications | default([])) | length }}"
-
-    # Fail fast if somehow empty
-    - name: Assert apps found
-      ansible.builtin.assert:
-        that:
-          - (vaas_parsed.applications | default([])) | length > 0
-        fail_msg: "No Venafi applications returned"
     
     # Examples of pulling data you’re likely to want
     - name: List app names
@@ -100,11 +76,11 @@
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
     - name: Get Certificates (up to {{ cert_limit }})
       ansible.builtin.uri:
-        url: "{{ tenant_base_url }}/outagedetection/v1/certificates?{{ cert_params }}&limit={{ cert_limit }}"
+        url: "https://api.venafi.cloud/outagedetection/v1/certificates?ownershipTree=false&excludeSupersededInstances=false&limit=1000"
         method: GET
         headers:
-          Content-Type: "application/json"
-          Authorization: "Bearer {{ vaas_api_key }}"
+          accept: "application/json"
+          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
         return_content: true
         status_code: [200]
       register: vaas_certs
