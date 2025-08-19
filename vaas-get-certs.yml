@@ -44,7 +44,7 @@
           tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
         return_content: true
         status_code: 200
-      register: od_apps
+      register: vaas_apps
 #    - name: Get Applications (tenant-scoped)
 #      ansible.builtin.uri:
 #        url: "{{ tenant_base_url }}/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false'"
