@@ -13,7 +13,7 @@
       common_name: "{{ common_name_default }}"
       #zone: "AAP25DemoCrt\\AAP25DemoCert"
       #alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
-      cert_path: "/tmp/{{ common_name_fake }}.crt"
+      cert_path: "/tmp/{{ common_name_default }}.crt"
       csr_origin: "local"
       csr_path: ""
     register: certout
