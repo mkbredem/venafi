@@ -2,7 +2,7 @@
   connection: local
   hosts: localhost
   vars:
-    common_name_fake: 'testcert-fake-{{ 99999999 | random }}.example.com'
+    common_name_default: 'webserver.example.com'
   tags:
     - fake
   tasks:
@@ -10,8 +10,9 @@
     venafi.machine_identity.venafi_certificate:
       #token: "{{ venafi_api_key }}"
       test_mode: true
-      common_name: 'testcert-fake-{{ 99999999 | random }}.example.com'
-      alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
+      common_name: "{{ common_name_default }}"
+      #zone: "AAP25DemoCrt\\AAP25DemoCert"
+      #alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
       cert_path: "/tmp/{{ common_name_fake }}.crt"
       csr_origin: "local"
       csr_path: ""
