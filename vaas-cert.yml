@@ -15,7 +15,7 @@
       #alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
       cert_path: "{{ cockpit_cert_path }}{{ inventory_hostname }}.cert"
       csr_origin: "service"
-      #csr_path: ""
+      csr_path: ""
     register: certout
   - name: dump test output
     debug:
