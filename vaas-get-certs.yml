@@ -51,6 +51,15 @@
         content: "{{ vaas_apps.content }}"
         mode: "0644"
 
+    - name: Normalize apps data
+      set_fact:
+        apps_list: >-
+          {{
+            vaas_apps.json['items']
+            if (vaas_apps.json is mapping and 'items' in vaas_apps.json)
+            else (vaas_apps.json if (vaas_apps.json is sequence) else [])
+          }}
+
     - name: Show basic Applications summary
       ansible.builtin.debug:
         msg:
