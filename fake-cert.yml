@@ -11,6 +11,7 @@
       common_name: 'testcert-fake-{{ 99999999 | random }}.example.com'
       alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
       cert_path: '/tmp'
+      csr_origin: local
     register: certout
   - name: dump test output
     debug:
