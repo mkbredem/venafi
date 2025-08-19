@@ -68,9 +68,9 @@
     - name: Show mbredeme details
       ansible.builtin.debug:
         msg:
-          fqdn: "{{ mbredeme_app.fullyQualifiedDomainNames | default([]) }}"
-          ports: "{{ mbredeme_app.ports | default([]) }}"
-          id: "{{ mbredeme_app.id }}"
+          fqdn: "{{ mbredeme_app.fullyQualifiedDomainNames | default([]) | to_nice_yaml }}"
+          ports: "{{ mbredeme_app.ports | default([]) | to_nice_yaml }}"
+          id: "{{ mbredeme_app.id | to_nice_yaml }}"
 
     # --- Certificates (Outage Detection API) ---
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
