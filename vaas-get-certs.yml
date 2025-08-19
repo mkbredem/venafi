@@ -35,16 +35,28 @@
         fail_msg: "Set venafi_api_key extra var or inject vaas_api_key from an AAP credential."
 
   tasks:
-    - name: Get Applications (tenant-scoped)
+    - name: Get Venafi Outage Detection Applications
       ansible.builtin.uri:
-        url: "{{ tenant_base_url }}/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false'"
+        url: >-
+          https://api.venafi.cloud/outagedetection/v1/applications
+          ?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false
         method: GET
         headers:
           Accept: "application/json"
-          Authorization: "Bearer {{ vaas_api_key }}"
+          tppl-api-key: "{{ vaas_api_key }}"
         return_content: true
-        status_code: [200]
-      register: vaas_apps
+        status_code: 200
+      register: od_apps
+#    - name: Get Applications (tenant-scoped)
+#      ansible.builtin.uri:
+#        url: "{{ tenant_base_url }}/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false'"
+#        method: GET
+#        headers:
+#          Accept: "application/json"
+#          Authorization: "Bearer {{ vaas_api_key }}"
+#        return_content: true
+#        status_code: [200]
+#      register: vaas_apps
 
     - name: Save Applications JSON
       ansible.builtin.copy:
