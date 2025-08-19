@@ -46,7 +46,7 @@
         status_code: 200
       register: vaas_apps
 
-    - name: Parse JSON (prefer .json, fall back to .content)
+    - name: Parse apps JSON (prefer .json, fall back to .content)
       ansible.builtin.set_fact:
         vaas_parsed: "{{ vaas_apps.json | default(vaas_apps.content | from_json) }}"
     
@@ -85,35 +85,21 @@
         status_code: [200]
       register: vaas_certs
 
-    - name: Save Certificates JSON
-      ansible.builtin.copy:
-        dest: "{{ certs_json }}"
-        content: "{{ vaas_certs.content }}"
-        mode: "0644"
+    - name: Parse cert JSON (prefer .json, fall back to .content)
+      ansible.builtin.set_fact:
+        vaas_parsed_certs: "{{ vaas_certs.json | default(vaas_apps.content | from_json) }}"
 
-    - name: Show certificate counts
+    - name: List app names
       ansible.builtin.debug:
-        msg:
-          - "Certificates HTTP {{ vaas_certs.status }}"
-          - "Certificates returned: {{ (vaas_certs.json.certificates | default([])) | length }}"
-          - "Next cursor present? {{ 'nextCursor' in (vaas_certs.json | default({})) }}"
+        msg: "{{ vaas_parsed_certs.certificates | map(attribute='certificateName') | list }}"
 
     # Optional: show expiring soon (example: <= 30 days). Adjust as you like.
-    - name: Compute 'expiring within 30 days' subset (best-effort)
-      ansible.builtin.set_fact:
-        expiring_soon: >-
-          {{
-            (vaas_certs.json.certificates | default([]))
-            | selectattr('validTo', 'defined')
-            | selectattr('validTo', 'search', '.*')    # keep those with a value
-            | list
-          }}
-
-    - name: Print a few sample certificate rows
-      ansible.builtin.debug:
-        var: expiring_soon[0:5]
-
-  # --- Notes on Pagination ---
-  # Some tenants return more than 'limit' certs and include 'nextCursor' in the response.
-  # To paginate, repeat the certificates GET adding '&cursor={{ cursor }}' until 'nextCursor' disappears.
-  # You can implement a simple loop with set_fact to accumulate results if needed.
+#    - name: Compute 'expiring within 30 days' subset (best-effort)
+#      ansible.builtin.set_fact:
+#        expiring_soon: >-
+#          {{
+#            (vaas_parsed_certs.certificates | default([]))
+#            | selectattr('validTo', 'defined')
+#            | selectattr('validTo', 'search', '.*')    # keep those with a value
+#            | list
+#          }}
