@@ -1,6 +1,7 @@
 - name: venafi_certificate_fake
   hosts: aap_demo_web_server
   vars:
+    cockpit_cert_path: "/etc/cockpit/ws-certs.d/"
     common_name_default: 'webserver.example.com'
   tags:
     - fake
@@ -8,13 +9,13 @@
   - name: venafi_certificate
     venafi.machine_identity.venafi_certificate:
       token: "{{ venafi_api_key }}"
-      test_mode: true
-      common_name: "{{ common_name_default }}"
-      zone: "mbredeme\\AAP25DemoCert"
+      #test_mode: true
+      common_name: "{{ inventory_hostname }}"
+      zone: "mbredeme\\mbredemeIT"
       #alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
-      cert_path: "/tmp/{{ common_name_default }}.crt"
-      csr_origin: "local"
-      csr_path: ""
+      cert_path: "{{ cockpit_cert_path }}{{ inventory_hostname }}.cert"
+      csr_origin: "service"
+      #csr_path: ""
     register: certout
   - name: dump test output
     debug:
