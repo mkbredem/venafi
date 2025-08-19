@@ -1,0 +1,17 @@
+- name: venafi_certificate_fake
+  connection: local
+  hosts: localhost
+  tags:
+    - fake
+  tasks:
+  - name: venafi_certificate
+    venafi_certificate:
+      #token: "{{ venafi_api_key }}"
+      test_mode: true
+      common_name: 'testcert-fake-{{ 99999999 | random }}.example.com'
+      alt_name: 'DNS:www.venafi.example,DNS:m.venafi.example'
+      cert_path: '/tmp'
+    register: certout
+  - name: dump test output
+    debug:
+      msg: '{{ certout }}'
