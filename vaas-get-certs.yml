@@ -59,6 +59,6 @@
               | list
             }}
 
-    - name: Show matching certs_json
-      ansible.builtin.debug:
-        var: hostvars[loalhost]['ansible_stats'][''data']['refresh_certificates']
+#    - name: Show matching certs_json
+#      ansible.builtin.debug:
+#        var: hostvars[loalhost]['ansible_stats'][''data']['refresh_certificates']
