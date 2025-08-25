@@ -91,7 +91,7 @@
 
     - name: Parse cert JSON (prefer .json, fall back to .content)
       ansible.builtin.set_fact:
-        vaas_parsed_certs: "{{ vaas_certs.json | default(vaas_apps.content | from_json) }}"
+        vaas_parsed_certs: "{{ vaas_certs.json | default(vaas_certs.content | from_json) }}"
 
     - name: List app names
       ansible.builtin.debug:
