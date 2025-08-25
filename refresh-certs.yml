@@ -1,0 +1,37 @@
+---
+- name: Rewnew Venafi Cloud certificates
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    cert_list: "{{ refresh_certificates }}"
+
+  tasks:
+    - name: Debug cert_list
+      ansible.builtin.debug:
+        var: cert_list
+
+#    - name: Get Venafi Outage Detection Applications
+#      ansible.builtin.uri:
+#        url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
+#        method: GET
+#        headers:
+#          accept: "application/json"
+#          content-type: "application/json"
+#          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
+#        body:
+#          csrAttributes:
+#            keyTypeParameters:
+#              keyCurve: "P256"
+#              keyType: "RSA"
+#              keyLength: 2048
+#            commonName: "{{ common_name }}"
+#          isVaaSGenerated: true
+#          applicationId: "{{ app_id}}"
+#          certificateIssuingTemplateId: "{{ issuding_template_id }}"
+#          validityPeriod: "P45D"
+#        body_format: json
+#        return_content: true
+#        status_code: 200,201
+#      register: cert_request_response
