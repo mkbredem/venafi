@@ -13,7 +13,7 @@
       ansible.builtin.debug:
         var: cert_list
 
-    - name: Get Venafi Outage Detection Applications
+    - name: Renew Certificates
       ansible.builtin.uri:
         url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
         method: GET
@@ -29,8 +29,8 @@
               keyLength: 2048
             commonName: "{{ item.certificateName }}"
           isVaaSGenerated: true
-          applicationId: "{{ item.applicationId }}"
-          certificateIssuingTemplateId: "{{ item.certificateIssuingTemplateId }}"
+          #applicationId: "{{ item.applicationIds[0] }}"
+          #certificateIssuingTemplateId: "{{ item.certificateIssuingTemplateId }}"
           existingCertificateId": "{{ item.certificateId }}"
           validityPeriod: P{{ validity_days }}D
         body_format: json
@@ -43,7 +43,7 @@
       ansible.builtin.debug:
         var: cert_request_response
 
-        
+
 #curl --request POST \
 #     --url https://api.venafi.cloud/outagedetection/v1/certificaterequests \
 #     --header 'accept: application/json' \
