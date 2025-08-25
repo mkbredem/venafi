@@ -117,6 +117,6 @@
               | list
             }}
 
-    - name: Show matching certs_json:
+    - name: Show matching certs_json
       ansible.builtin.debug:
         var: refresh_certificates
