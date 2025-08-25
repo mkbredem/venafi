@@ -105,23 +105,13 @@
       ansible.builtin.debug:
         msg: "{{ (cert_list | selectattr('certificateName', 'search', 'mbredeme') | list) | to_nice_json }}"
 
-    - name: Publish refresh_certificates directly with set_stats
+    - name: Publish refresh_certificates with all matching cert objects
       ansible.builtin.set_stats:
         data:
           refresh_certificates: >-
             {{
-              vaas_parsed_certs.certificates
-              | map('extract', {
-                  'certificateName': 'certificateName',
-                  'validityEnd': 'validityEnd',
-                  'applicationID': 'applicationID',
-                  'applicationId': 'applicationId',
-                  'certificateIssuingTemplateId': 'certificateIssuingTemplateId'
-                }, default=omit)
-              | selectattr(
-                  'certificateName', 'match',
-                  '(^|\\.)(' + (target_domains | map('regex_escape') | join('|')) + ')$'
-                )
+              cert_list
+              | selectattr('certificateName', 'search', 'mbredeme')
               | list
             }}
 
