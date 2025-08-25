@@ -20,6 +20,10 @@
     apps_json: "{{ out_dir }}/applications.json"
     certs_json: "{{ out_dir }}/certificates.json"
 
+    target_domains:
+      - mkbredem.com
+      - mbredeme.com
+
   pre_tasks:
     - name: Ensure output directory exists
       ansible.builtin.file:
@@ -93,13 +97,26 @@
       ansible.builtin.debug:
         msg: "{{ vaas_parsed_certs.certificates | map(attribute='certificateName') | list }}"
 
-    # Optional: show expiring soon (example: <= 30 days). Adjust as you like.
-#    - name: Compute 'expiring within 30 days' subset (best-effort)
-#      ansible.builtin.set_fact:
-#        expiring_soon: >-
-#          {{
-#            (vaas_parsed_certs.certificates | default([]))
-#            | selectattr('validTo', 'defined')
-#            | selectattr('validTo', 'search', '.*')    # keep those with a value
-#            | list
-#          }}
+    - name: Publish refresh_certificates directly with set_stats
+      ansible.builtin.set_stats:
+        data:
+          refresh_certificates: >-
+            {{
+              vaas_certs.certificates
+              | map('extract', {
+                  'certificateName': 'certificateName',
+                  'validityEnd': 'validityEnd',
+                  'applicationID': 'applicationID',
+                  'applicationId': 'applicationId',
+                  'certificateIssuingTemplateId': 'certificateIssuingTemplateId'
+                }, default=omit)
+              | selectattr(
+                  'certificateName', 'match',
+                  '(^|\\.)(' + (target_domains | map('regex_escape') | join('|')) + ')$'
+                )
+              | list
+            }}
+
+    - name: Show matching certs_json:
+      ansible.builtin.debug:
+        var: refresh_certificates

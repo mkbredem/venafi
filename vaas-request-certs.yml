@@ -1,0 +1,91 @@
+---
+- name: Request Venafi Cloud certificates
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+      
+  tasks:
+    - name: Get Venafi Outage Detection Applications
+      ansible.builtin.uri:
+        url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
+        method: GET
+        headers:
+          accept: "application/json"
+          content-type: "application/json"
+          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
+        body:
+          csrAttributes:
+            keyTypeParameters:
+              keyCurve: "P256"
+              keyType: "RSA"
+              keyLength: 2048
+            commonName: "{{ common_name }}"
+          isVaaSGenerated: true
+          applicationId: "{{ app_id}}"
+          certificateIssuingTemplateId: "{{ issuding_template_id }}"
+          validityPeriod: "P45D"
+        body_format: json
+        return_content: true
+        status_code: 200,201
+      register: cert_request_response
+
+#curl --request POST \
+#     --url https://api.venafi.cloud/outagedetection/v1/certificaterequests \
+#     --header 'accept: application/json' \
+#     --header 'content-type: application/json' \
+#     --header 'tppl-api-key: 7aa4a121-3c3d-455f-9c4b-872a25c455f8' \
+#     --data '
+#{
+#  "csrAttributes": {
+#    "keyTypeParameters": {
+#      "keyCurve": "P256",
+#      "keyType": "RSA",
+#      "keyLength": 2048
+#    },
+#    "commonName": "webserver.mbredeme.com"
+#  },
+#  "isVaaSGenerated": true,
+#  "applicationId": "db56a9b0-7980-11f0-9cc5-31c907dcc2e3",
+#  "certificateIssuingTemplateId": "e1d81b71-6e54-11f0-b1b4-9323192b9202",
+#  "validityPeriod": "P45D"
+#}
+#'
+
+############ output ###################
+#{
+#  "certificateRequests": [
+#    {
+#      "id": "7705bed0-8199-11f0-8bf4-735f2169cb31",
+#      "companyId": "dfe7e430-6e54-11f0-9d4b-d5bd621edef1",
+#      "applicationId": "db56a9b0-7980-11f0-9cc5-31c907dcc2e3",
+#      "creationDate": "2025-08-25T09:54:17.590+00:00",
+#      "modificationDate": "2025-08-25T09:54:17.609+00:00",
+#      "status": "REQUESTED",
+#      "certificateOwnerUserId": "6ae12360-73c0-11f0-8e5b-73de973b08ba",
+#      "certificateIssuingTemplateId": "e1d81b71-6e54-11f0-b1b4-9323192b9202",
+#      "certificateIds": [],
+#      "certificateSigningRequest": "-----BEGIN CERTIFICATE REQUEST-----\nMIICZjCCAU4CAQAwITEfMB0GA1UEAxMWd2Vic2VydmVyLm1icmVkZW1lLmNvbTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMNDA9sGYG/1Y6sJiXt4p3SH\n4cT+1o6J/+OTsCzQGje8bFb1hsKACs3wlEREdQu/xiRHCOB2MPtiVlsoMlP+cS5+\n096DJ2viOmdgy1a4r3me9D6dAwWhRY7BU97IBZFR/OOVdyWowW2JyZSYWkJc42uS\nYFnMjYI7sZQWdf0mj424ZVYcO2HmX2KChhxjDG6QYhZYiA7PUSLbpOQNwvmpiVP1\nxRHOE1CtSLgDE2S+Tlgxw9hEhVv/BoRYW7YizknNnwgPAJR0rW3dQ0NghT+/GMtJ\n3O+8MJG+hKuUQmHpZx2DOL+30wAF8vfiO812bd+VkZZPviCnr4t2twXY8LU7lJkC\nAwEAAaAAMA0GCSqGSIb3DQEBCwUAA4IBAQAFxeDMbCZ4Xs2fchp1jTGBujQL/Vuq\nL9rnY6F6VpHnzvPnT7PyL0FCyv5G6eXKYzE5upeINazdnLe0pKw6UPrr7lkhjzM/\nBIzPm6ztHA9zLeEWtdM60MiEVZhIWENLXXHol6LvqbMF7iMoqqmCRnQGXxe8gVxj\nrmzNrEG8N+XveK6mGN/T/fv9+SfGFnyyVXaCWIbe9Ku34OQwyBH8q7U17UOzkKvg\nYpElNboDiiAe1bxNdcC5dL6TBfFP++KEYpBhZ+vCxeNERkSTDHPTho0B/L/LV8ep\ncQuGdgDfO8p0KR5hbJ6uV2N9SsFrBDEUeGYFqBvzY8zcqUWuZo3BHu57\n-----END CERTIFICATE REQUEST-----\n",
+#      "subjectDN": "cn=webserver.mbredeme.com",
+#      "keyLength": 2048,
+#      "keyType": "RSA",
+#      "subjectAlternativeNamesByType": {
+#        "otherName": [],
+#        "rfc822Name": [],
+#        "dNSName": [],
+#        "x400Address": [],
+#        "directoryName": [],
+#        "ediPartyName": [],
+#        "uniformResourceIdentifier": [],
+#        "iPAddress": [],
+#        "registeredID": []
+#      },
+#      "validityPeriod": "P7D",
+#      "tags": [],
+#      "approverUserIds": [],
+#      "approverTeamIds": [],
+#      "approvedIds": []
+#    }
+#  ]
+#}
