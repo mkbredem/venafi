@@ -93,7 +93,7 @@
       ansible.builtin.set_fact:
         vaas_parsed_certs: "{{ vaas_certs.json | default(vaas_certs.content | from_json) }}"
 
-    - name: List app names
+    - name: List cert names
       ansible.builtin.debug:
         msg: "{{ vaas_parsed_certs.certificates | map(attribute='certificateName') | list }}"
 
@@ -102,7 +102,7 @@
         data:
           refresh_certificates: >-
             {{
-              vaas_certs.certificates
+              vaas_parsed_certs.certificates
               | map('extract', {
                   'certificateName': 'certificateName',
                   'validityEnd': 'validityEnd',
