@@ -97,15 +97,13 @@
       ansible.builtin.debug:
         msg: "{{ vaas_parsed_certs.certificates | map(attribute='certificateName') | list }}"
 
-    - name: Show only certs whose name contains "mbredeme"
+    - name: Normalize cert list from response
+      ansible.builtin.set_fact:
+        cert_list: "{{ vaas_parsed_certs.get('certificates', vaas_parsed_certs.get('items', [])) }}"
+    
+    - name: Debug full cert objects where name contains "mbredeme" (pretty JSON)
       ansible.builtin.debug:
-        msg: >-
-          {{
-            vaas_parsed_certs.certificates
-            | selectattr('certificateName', 'search', 'mbredeme')
-            | map(attribute='certificateName')
-            | list
-          }}
+        msg: "{{ (cert_list | selectattr('certificateName', 'search', 'mbredeme') | list) | to_nice_json }}"
 
     - name: Publish refresh_certificates directly with set_stats
       ansible.builtin.set_stats:
