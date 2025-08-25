@@ -97,6 +97,16 @@
       ansible.builtin.debug:
         msg: "{{ vaas_parsed_certs.certificates | map(attribute='certificateName') | list }}"
 
+    - name: Show only certs whose name contains "mbredeme"
+      ansible.builtin.debug:
+        msg: >-
+          {{
+            vaas_parsed_certs.certificates
+            | selectattr('certificateName', 'search', 'mbredeme')
+            | map(attribute='certificateName')
+            | list
+          }}
+
     - name: Publish refresh_certificates directly with set_stats
       ansible.builtin.set_stats:
         data:
