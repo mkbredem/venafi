@@ -23,7 +23,7 @@
     - name: Publish mbredeme appID and issuingTemplateId 
       ansible.builtin.set_stats:
         data:
-          app-data: >-
+          app_data: >-
               app_id: "0fe2a8a0-7981-11f0-883f-df2452f1f876"
               template_id: "4c9a85f0-7982-11f0-aaff-65a6a8a1d372"
 

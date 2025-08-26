@@ -32,8 +32,8 @@
               keyLength: 2048
             commonName: "{{ item.certificateName }}"
           isVaaSGenerated: true
-          applicationId: "{{ app-data.app_id }}"
-          certificateIssuingTemplateId: "{{ app-data.template_id }}"
+          applicationId: "{{ app_data.app_id }}"
+          certificateIssuingTemplateId: "{{ app_data.template_id }}"
           existingCertificateId": "{{ item.instances[0].certificateId }}"
           validityPeriod: P{{ validity_days }}D
         body_format: json
