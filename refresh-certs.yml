@@ -18,7 +18,7 @@
 
     - name: Renew Certificates
       ansible.builtin.uri:
-        url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
+        url: "https://api.venafi.cloud/outagedetection/v1/certificaterequests"
         method: POST
         headers:
           accept: "application/json"
