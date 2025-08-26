@@ -20,6 +20,39 @@
       - mbredeme.com
 
   tasks:
+    # --- Applications (Outage Detection API) ---
+    # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
+    - name: Get Applications (up to {{ cert_limit }})
+      ansible.builtin.uri:
+        url: "https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false"
+        method: GET
+        headers:
+          accept: "application/json"
+          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
+        return_content: true
+        status_code: [200]
+      register: vaas_apps
+
+    - name: Publish mbredeme appID and issuingTemplateId 
+      ansible.builtin.set_stats:
+        data:
+          app-data: >-
+            {{
+              vaas_apps
+              | selectattr('certificateName', 'search', 'mbredeme')
+              | list
+            }}
+
+    - name: show app-data
+      ansible.builtin.debug:
+        var: hostvars[loalhost]['ansible_stats']['data']['app-data']
+        
+#curl --request GET \
+#     --url 'https://api.venafi.cloud/outagedetection/v1/applications?ownerDetails=false&ownershipCheck=false&issuingTemplateAssigned=false&ownershipTree=false' \
+#     --header 'accept: application/json' \
+#     --header 'tppl-api-key: 7aa4a121-3c3d-455f-9c4b-872a25c455f8'
+
+
     # --- Certificates (Outage Detection API) ---
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
     - name: Get Certificates (up to {{ cert_limit }})
