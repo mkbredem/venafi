@@ -25,7 +25,7 @@
         data:
           app_data:
               app_id: "0fe2a8a0-7981-11f0-883f-df2452f1f876"
-              template_id: "4c9a85f0-7982-11f0-aaff-65a6a8a1d372"
+              template_id: "e1d81b71-6e54-11f0-b1b4-9323192b9202" #defeault template
 
     # --- Certificates (Outage Detection API) ---
     # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
@@ -52,9 +52,9 @@
       ansible.builtin.set_fact:
         cert_list: "{{ vaas_parsed_certs.get('certificates', vaas_parsed_certs.get('items', [])) }}"
     
-    - name: Debug full cert objects where name contains "mbredeme" (pretty JSON)
+    - name: Debug full cert objects where name contains "mkbredem" (pretty JSON)
       ansible.builtin.debug:
-        msg: "{{ (cert_list | selectattr('certificateName', 'search', 'mbredeme') | list) | to_nice_json }}"
+        msg: "{{ (cert_list | selectattr('certificateName', 'search', 'mkbredem') | list) | to_nice_json }}"
 
     - name: Publish refresh_certificates with all matching cert objects
       ansible.builtin.set_stats:
@@ -62,7 +62,7 @@
           refresh_certificates: >-
             {{
               cert_list
-              | selectattr('certificateName', 'search', 'mbredeme')
+              | selectattr('certificateName', 'search', 'mkbredem')
               | list
             }}
 
