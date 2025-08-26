@@ -24,7 +24,7 @@
       ansible.builtin.set_stats:
         data:
           app_data:
-              app_id: "0fe2a8a0-7981-11f0-883f-df2452f1f876"
+              app_id: "db56a9b0-7980-11f0-9cc5-31c907dcc2e3"
               template_id: "e1d81b71-6e54-11f0-b1b4-9323192b9202" #defeault template
 
     # --- Certificates (Outage Detection API) ---
