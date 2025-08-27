@@ -7,7 +7,7 @@
 
   # RHEL 8,9 Venafi Internal Root CA installation and prep: https://www.perplexity.ai/search/how-to-add-new-root-certificat-MUhgJbw4R5m_uGV1zlRhmg
 
-   tasks: 
+  tasks: 
     - name: Install ca-certtificates
       ansible.builtin.yum:
         name: ca-certificates
