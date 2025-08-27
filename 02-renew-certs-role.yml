@@ -5,6 +5,15 @@
 
   roles:
     - role: "venafi.machine_identity.certificate"
+      # Provider: 'vaas' (Venafi Cloud) or 'tpp'
+      certificate_provider: "vaas"
+
+      # If your collection uses API keys (older style), use this instead and remove access_token:
+      # certificate_api_key: "{{ venafi_api_key }}"
+
+      # REQUIRED for both VaaS and TPP
+      certificate_zone: "AAP25DemoCrt\\Default"   # Application\IssuingTemplate (note the backslash)
+      # ^ In YAML, a single backslash is fine when inside quotes. Double backslash is also safe.
       certificate_common_name: "{{ inventory_hostname}}"
       certificate_cert_dir: "/tmp/ansible/etc/ssl/{{ certificate_common_name }}"
       certificate_cert_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.pem"
