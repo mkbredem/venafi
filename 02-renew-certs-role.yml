@@ -3,11 +3,14 @@
   hosts: all
   gather_facts: false
 
+  vars_files:
+    - credentials.yml
+
   roles:
     - role: "venafi.machine_identity.certificate"
       # Provider: 'vaas' (Venafi Cloud) or 'tpp'
       certificate_provider: "vaas"
-
+      common_name: "{{ inventory_hostname }}"
       # If your collection uses API keys (older style), use this instead and remove access_token:
       # certificate_api_key: "{{ venafi_api_key }}"
 
