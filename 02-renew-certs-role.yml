@@ -3,19 +3,17 @@
   hosts: all
   gather_facts: false
 
-  vars_files:
-    - credentials.yml
-
   roles:
     - role: "venafi.machine_identity.certificate"
       # Provider: 'vaas' (Venafi Cloud) or 'tpp'
       certificate_provider: "vaas"
       common_name: "{{ inventory_hostname }}"
+      token: "{{ venafi_api_key }}"
       # If your collection uses API keys (older style), use this instead and remove access_token:
       # certificate_api_key: "{{ venafi_api_key }}"
 
       # REQUIRED for both VaaS and TPP
-      #zone: 'AAP25DemoCrt\Default'   # currently defined in credentials.yml (not here) | format: Application\IssuingTemplate (note the backslash)
+      zone: 'AAP25DemoCrt\Default'   # currently defined in credentials.yml (not here) | format: Application\IssuingTemplate (note the backslash)
       # ^ In YAML, a single backslash is fine when inside quotes. Double backslash is also safe.
       certificate_common_name: "{{ inventory_hostname}}"
       certificate_cert_dir: "/tmp/ansible/etc/ssl/{{ certificate_common_name }}"
@@ -23,6 +21,11 @@
       certificate_chain_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.chain.pem"
       certificate_privatekey_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.key"
       certificate_csr_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.csr"
+
+      csr_origin: local
+      privatekey_reuse: false                 # <— let it generate a new key if missing
+      privatekey_type: RSA                    # or ECDSA
+      privatekey_size: 2048                   # or 4096 (if RSA); for ECDSA use privatekey_curve: P256
 
       # Where to execute venafi_certificate module. If set to false, certificate will be
       # created on ansible master host and then copied to the remote server.
