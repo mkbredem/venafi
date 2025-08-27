@@ -12,7 +12,7 @@
       # certificate_api_key: "{{ venafi_api_key }}"
 
       # REQUIRED for both VaaS and TPP
-      zone: "AAP25DemoCrt\\Default"   # Application\IssuingTemplate (note the backslash)
+      zone: 'AAP25DemoCrt\Default'   # Application\IssuingTemplate (note the backslash)
       # ^ In YAML, a single backslash is fine when inside quotes. Double backslash is also safe.
       certificate_common_name: "{{ inventory_hostname}}"
       certificate_cert_dir: "/tmp/ansible/etc/ssl/{{ certificate_common_name }}"
