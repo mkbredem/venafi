@@ -22,10 +22,10 @@
       certificate_privatekey_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.key"
       certificate_csr_path: "{{ certificate_cert_dir }}/{{ certificate_common_name }}.csr"
 
-      csr_origin: local
-      privatekey_reuse: false                 # <— let it generate a new key if missing
-      privatekey_type: RSA                    # or ECDSA
-      privatekey_size: 2048                   # or 4096 (if RSA); for ECDSA use privatekey_curve: P256
+      certificate_csr_origin: local
+      certificate_privatekey_reuse: false
+      certificate_privatekey_type: RSA
+      certificate_privatekey_size: 2048
 
       # Where to execute venafi_certificate module. If set to false, certificate will be
       # created on ansible master host and then copied to the remote server.
