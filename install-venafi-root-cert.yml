@@ -1,0 +1,35 @@
+---
+- name: Isntall root certificate on RHEL leveraging venafi's internal root ca
+  hosts: all
+  become: true
+  vars:
+    venafi_api_key: "{{ lookup('env', 'VENAFI_API_KEY') }}"
+
+  # RHEL 8,9 Venafi Internal Root CA installation and prep: https://www.perplexity.ai/search/how-to-add-new-root-certificat-MUhgJbw4R5m_uGV1zlRhmg
+
+   tasks: 
+    - name: Install ca-certtificates
+      ansible.builtin.yum:
+        name: ca-certificates
+        state: present
+
+    - name: Copy certificate_chain.cer to /etc/pki/ca-trust/source/anchors/
+      ansible.builtin.copy:
+        src: files/certificate_chain.cer
+        dest: /etc/pki/ca-trust/source/anchors/venafie_certificate_chain.cer
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Update Trusted CA Store
+      ansible.builtin.command:
+        cmd: update-ca-trust extract
+
+    - name: Verify Venafi Root CA is installed
+      ansible.builtin.command:
+        cmd: openssl x509 -in /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem -noout -issuer -subject
+      register: openssl_output
+
+    - name: Display OpenSSL Output
+      ansible.builtin.debug:
+        msg: "{{ openssl_output.stdout_lines }}"
