@@ -19,10 +19,17 @@
         dest: "{{ _dest_ }}"
         remote_src: true
 
-    - name: Remove original cockpit certs after backup
+    - name: Find files in cockpit certs directory
+      ansible.builtin.find:
+        paths: /etc/cockpit/ws-certs.d/
+        file_type: file
+      register: cockpit_cert_files
+    
+    - name: Remove cockpit cert files
       ansible.builtin.file:
-        path: /etc/cockpit/ws-certs.d/
+        path: "{{ item.path }}"
         state: absent
+      loop: "{{ cockpit_cert_files.files }}"
 
     - name: Install new cockpit cert
       ansible.builtin.copy:
