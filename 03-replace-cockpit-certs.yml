@@ -1,0 +1,43 @@
+---
+- name: Cockpit certificate renewal
+  hosts: all
+  vars:
+    _dest_: "/etc/cockpit/cert_backups-{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Ensure backup cert dir exists
+      ansible.builtin.file:
+        state: directory
+        path: "{{ _dest_ }}"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Backup existing cockpit certs
+      ansible.builtin.copy:
+        src: /etc/cockpit/ws-certs.d/
+        dest: "{{ _dest_ }}"
+        remote_src: true
+
+    - name: Remove original cockpit certs after backup
+      ansible.builtin.file:
+        path: /etc/cockpit/ws-certs.d/
+        state: absent
+
+    - name: Install new cockpit cert
+      ansible.builtin.copy:
+        src: /etc/ssl/certs/{{ inventory_hostname }}.chain.pem
+        dest: "/etc/cockpit/ws-certs.d/{{ inventory_hostname }}.crt"
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Refresh cockpit
+
+  handlers:
+    - name: Refresh cockpit
+      ansible.builtin.services:
+        state: restart
+        name: cockpit
+    
+
