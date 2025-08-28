@@ -26,7 +26,7 @@
 
     - name: Install new cockpit cert
       ansible.builtin.copy:
-        src: /etc/ssl/certs/{{ inventory_hostname }}.chain.pem
+        src: /etc/ssl/{{ inventory_hostname }}.chain.pem
         dest: "/etc/cockpit/ws-certs.d/{{ inventory_hostname }}.crt"
         remote_src: true
         owner: root
