@@ -44,7 +44,7 @@
   handlers:
     - name: Refresh cockpit
       ansible.builtin.service:
-        state: restart
+        state: restarted
         name: cockpit
     
 
