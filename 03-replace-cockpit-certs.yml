@@ -31,15 +31,23 @@
         state: absent
       loop: "{{ cockpit_cert_files.files }}"
 
-    - name: Install new cockpit cert
+    - name: Copy {{ inventory_hostname }}.pem as .crt
       ansible.builtin.copy:
-        src: /etc/ssl/{{ inventory_hostname }}.chain.pem
+        src: "/etc/ssl/{{ inventory_hostname }}.pem"
         dest: "/etc/cockpit/ws-certs.d/{{ inventory_hostname }}.crt"
         remote_src: true
         owner: root
         group: root
         mode: '0644'
-      notify: Refresh cockpit
+    
+    - name: Copy {{ inventory_hostname }}.key
+      ansible.builtin.copy:
+        src: "/etc/ssl/{{ inventory_hostname }}.key"
+        dest: "/etc/cockpit/ws-certs.d/{{ inventory_hostname }}.key"
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0600'
 
   handlers:
     - name: Refresh cockpit
