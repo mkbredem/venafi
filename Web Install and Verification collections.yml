@@ -1,0 +1,13 @@
+---
+- name: Install web server, insert an index page, verify service is started and that the index page appears
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: RHEL Apache config
+      ansible.builtin.include_role:
+        name: webservers_collection
+      tags:
+        - always
+
+

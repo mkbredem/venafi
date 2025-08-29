@@ -1,0 +1,28 @@
+---
+- name: Install and create apach website with basic hello world template on https.
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Apache Web Server
+      ansible.builtin.package:
+        name: httpd
+        state: present
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /var/www/html/{{inventory_hostname}}/html
+        state: directory
+        mode: "0755"
+
+    - name: Create an index.html file
+      ansible.builtin.copy:
+        src: index.html
+        dest: /var/www/html/{{inventory_hostname}}/html/index.html
+        
+    - name: Enable the new site
+      ansible.builtin.shell: /usr/sbin/a2ensite example.com
+
+    - name: Restart Apache
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
