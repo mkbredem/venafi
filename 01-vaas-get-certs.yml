@@ -91,7 +91,7 @@
     - name: Publish unique target_hosts from refresh_certificates
       ansible.builtin.set_stats:
         data:
-          target_hosts: "{{ refresh_certificates | map(attribute='certificateName') | list | unique }}"
+          target_hosts: "{{ cert_list | map(attribute='certificateName') | list | unique }}"
 #curl --request POST \
 #     --url 'https://api.venafi.cloud/outagedetection/v1/certificatesearch?ownershipTree=false&excludeSupersededInstances=false' \
 #     --header 'accept: application/json' \
