@@ -17,6 +17,7 @@
 
     target_domains:
       - mkbredem.com
+      - mbredeme.com
 
   tasks:
     - name: Publish mbredeme appID and issuingTemplateId 
@@ -26,41 +27,18 @@
               app_id: "db56a9b0-7980-11f0-9cc5-31c907dcc2e3"
               template_id: "e1d81b71-6e54-11f0-b1b4-9323192b9202" #defeault template
 
-    # --- Certificates Needing Renewal ---
-    # NOTE: This grabs up to results. If you have more, see 'Pagination' note below.
-    - name: Search for certificates in Venafi Cloud
+    # --- Certificates (Outage Detection API) ---
+    # NOTE: This grabs up to 'cert_limit' results. If you have more, see 'Pagination' note below.
+    - name: Get Certificates (up to {{ cert_limit }})
       ansible.builtin.uri:
-        url: "https://api.venafi.cloud/outagedetection/v1/certificatesearch?ownershipTree=false&excludeSupersededInstances=false"
-        method: POST
+        url: "https://api.venafi.cloud/outagedetection/v1/certificates?ownershipTree=false&excludeSupersededInstances=false&limit=1000"
+        method: GET
         headers:
           accept: "application/json"
-          content-type: "application/json"
-          tppl-api-key: "{{ vaas_api_key }}"
-        body_format: json
-        body:
-          paging:
-            pageNumber: 0
-            pageSize: 10
-          expression:
-            operator: "AND"
-            operands:
-              - field: "certificateName"
-                operator: "FIND"
-                value: "mkbredem"
-              - field: "validityPeriodDays"
-                operator: "LTE"
-                value: "90"
-              - field: "versionType"
-                operator: "MATCH"
-                value: "CURRENT"
+          tppl-api-key: "{{ vaas_api_key | default('REDACT_ME') }}"
         return_content: true
-        status_code: 200
+        status_code: [200]
       register: vaas_certs
-
-    - name: Show Venafi certificate search results
-      ansible.builtin.debug:
-        var: vaas_certs.json
-
 
     - name: Parse cert JSON (prefer .json, fall back to .content)
       ansible.builtin.set_fact:
@@ -88,36 +66,6 @@
               | list
             }}
 
-#curl --request POST \
-#     --url 'https://api.venafi.cloud/outagedetection/v1/certificatesearch?ownershipTree=false&excludeSupersededInstances=false' \
-#     --header 'accept: application/json' \
-#     --header 'content-type: application/json' \
-#     --header 'tppl-api-key: 7aa4a121-3c3d-455f-9c4b-872a25c455f8' \
-#     --data '
-#{
-#  "paging": {
-#    "pageNumber": 0,
-#    "pageSize": 10
-#  },
-#  "expression": {
-#    "operands": [
-#      {
-#        "field": "certificateName",
-#        "operator": "FIND",
-#        "value": "mkbredem"
-#      },
-#      {
-#        "field": "validityPeriodDays",
-#        "operator": "LTE",
-#        "value": "90"
-#      },
-#      {
-#        "field": "versionType",
-#        "value": "CURRENT",
-#        "operator": "MATCH"
-#      }
-#    ],
-#    "operator": "AND"
-#  }
-#}
-#'
+#    - name: Show matching certs_json
+#      ansible.builtin.debug:
+#        var: hostvars[loalhost]['ansible_stats'][''data']['refresh_certificates']

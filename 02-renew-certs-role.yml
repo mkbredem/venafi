@@ -1,6 +1,6 @@
 ---
 - name: Renew Venfi Cloud Certificates
-  hosts: all
+  hosts: "{{ target_hosts }}"
   gather_facts: false
 
   roles:
