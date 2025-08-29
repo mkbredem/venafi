@@ -52,6 +52,7 @@
     owner: root
     group: root
     mode: "0400"
+    remote_src: true
 
 - name: Insert Index Page for webpage
   ansible.builtin.template:
