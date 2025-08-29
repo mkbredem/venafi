@@ -96,7 +96,7 @@
     - name: Publish certificate ids to be retired
       ansible.builtin.set_stats:
         data:
-          retire_certs: " {{ cert_list | map(attribute='certificateId') | list }}"
+          retire_certs: " {{ cert_list | map(attribute='id') | list }}"
 #curl --request POST \
 #     --url 'https://api.venafi.cloud/outagedetection/v1/certificatesearch?ownershipTree=false&excludeSupersededInstances=false' \
 #     --header 'accept: application/json' \
