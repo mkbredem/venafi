@@ -18,8 +18,7 @@
           tppl-api-key: "{{ vaas_api_key }}"
         body_format: json
         body:
-          certificateIds:
-            - "06e857e0-835e-11f0-b0f0-c51f9fbfeb15"
+          certificateIds: "{{ retire_certs }}" 
         return_content: true
         status_code: 200
       register: retire_response
