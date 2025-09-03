@@ -40,7 +40,7 @@
         body:
           paging:
             pageNumber: 0
-            pageSize: 10
+            pageSize: 100
           expression:
             operator: "AND"
             operands:
