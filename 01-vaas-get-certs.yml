@@ -51,9 +51,9 @@
               - field: "validityPeriodDays"
                 operator: "LTE"
                 value: "{{ validity_check }}"
-              - field: "versionType"
+              - field: "certificateStatus"
                 operator: "MATCH"
-                value: "CURRENT"
+                value: "ACTIVE"
         return_content: true
         status_code: 200
       register: vaas_certs
