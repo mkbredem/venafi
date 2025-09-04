@@ -2,6 +2,9 @@
 - name: Renew Venfi Cloud Certificates
   hosts: "{{ target_hosts }}"
   gather_facts: false
+  vars:
+    before_expired_hours: "{{ validity_check * 24 }}"
+    validity_hours: "{{ validity_days * 24 }}"
 
   roles:
     - role: "venafi.machine_identity.certificate"

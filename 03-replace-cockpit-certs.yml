@@ -49,7 +49,6 @@
         group: root
         mode: '0600'
 
-  handlers:
     - name: Refresh cockpit
       ansible.builtin.service:
         state: restarted
