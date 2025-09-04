@@ -3,7 +3,7 @@
   hosts: "{{ target_hosts }}"
   gather_facts: false
   vars:
-    validity_days "{{ 90 }}"
+    validity_days: 90
     before_expired_hours: "{{ validity_check * 24 }}"
     validity_hours: "{{ validity_days * 24 }}"
 
