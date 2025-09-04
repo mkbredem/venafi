@@ -21,6 +21,9 @@
       - mkbredem.com
 
   tasks:
+    - debug:
+        var: cert_name_search_phrase
+
     - name: Publish mbredeme appID and issuingTemplateId 
       ansible.builtin.set_stats:
         data:
