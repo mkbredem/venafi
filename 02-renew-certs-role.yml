@@ -37,4 +37,5 @@
       certificate_remote_privatekey_path: "{{ certificate_remote_cert_dir }}/{{ certificate_common_name }}.key"
       # Set to false if you don't want to copy private key to remote location.
       certificate_copy_private_key_to_remote: true
-      certificate_before_expired_hours: "{{ valdity_days * 24 | }}" #validity days passed from survey
+      certificate_before_expired_hours: "{{ valdity_check * 24 }}" #validity_check passed from survey
+      certificate_validity_hours: "{{ valdiity_days * 24 }}" #validity_days passed from survey
