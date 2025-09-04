@@ -9,6 +9,7 @@
     vaas_api_key: "{{ venafi_api_key }}"   # or inject via AAP credential as a variable
     tenant_base_url: "https://eval-85300634.venafi.cloud" # your tenant base
     global_api_url:  "https://api.venafi.cloud"
+    validity_check: 7
     # Many APIs are also available under api.venafi.cloud; most tenants proxy on their base URL too.
 
     # === Tuning ===
@@ -49,7 +50,7 @@
                 value: "mkbredem"
               - field: "validityPeriodDays"
                 operator: "LTE"
-                value: "90"
+                value: "{{ validity_check }}"
               - field: "versionType"
                 operator: "MATCH"
                 value: "CURRENT"
