@@ -10,6 +10,7 @@
     tenant_base_url: "https://eval-85300634.venafi.cloud" # your tenant base
     global_api_url:  "https://api.venafi.cloud"
     validity_check: 7
+    cert_name_search_phrase: mkbredem
     # Many APIs are also available under api.venafi.cloud; most tenants proxy on their base URL too.
 
     # === Tuning ===
@@ -47,7 +48,7 @@
             operands:
               - field: "certificateName"
                 operator: "FIND"
-                value: "mkbredem"
+                value: "{{ cert_name_search_phrase }}"
               - field: "validityPeriodDays"
                 operator: "LTE"
                 value: "{{ validity_check }}"
