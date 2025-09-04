@@ -6,6 +6,10 @@
     before_expired_hours: "{{ validity_check * 24 }}"
     validity_hours: "{{ validity_days * 24 }}"
 
+  pre_tasks:
+    - debug: 
+        msg: "before_epxired_hours: {{ before_expired_hours }} and validity_hours: {{ validity_hours }}"
+
   roles:
     - role: "venafi.machine_identity.certificate"
       # Provider: 'vaas' (Venafi Cloud) or 'tpp'
