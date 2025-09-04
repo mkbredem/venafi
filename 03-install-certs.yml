@@ -1,6 +1,0 @@
----
-- name: install renewed certs for cockpit
-  hosts: all
-  
-  tasks:
-    - n
