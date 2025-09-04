@@ -1,6 +1,6 @@
 ---
 - name: Cockpit certificate renewal
-  hosts: all
+  hosts: "{{ target_hosts }}"
   vars:
     _dest_: "/etc/cockpit/cert_backups-{{ ansible_date_time.iso8601_basic_short }}"
 
